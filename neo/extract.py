@@ -24,8 +24,24 @@ def load_neos(neo_csv_path):
     :param neo_csv_path: A path to a CSV file containing data about near-Earth objects.
     :return: A collection of `NearEarthObject`s.
     """
-    # TODO: Load NEO data from the given CSV file.
-    return ()
+    # Load NEO data from the given CSV file.
+    data=[]
+    with open(neo_csv_path, 'r') as file:
+        reader = csv.reader(file)
+        for i, lines in enumerate(reader):
+            if i==0:
+                designation_index = lines.index('pdes')
+                name_index = lines.index('name')
+                pha_index = lines.index('pha')
+                diameter_index = lines.index('diameter')
+            else:
+                data.append(NearEarthObject(
+                    designation=lines[designation_index],
+                    name=lines[name_index],
+                    diameter=lines[diameter_index],
+                    hazardous=True if lines[pha_index] == 'Y' else False
+                ))
+    return data
 
 
 def load_approaches(cad_json_path):
@@ -34,5 +50,21 @@ def load_approaches(cad_json_path):
     :param cad_json_path: A path to a JSON file containing data about close approaches.
     :return: A collection of `CloseApproach`es.
     """
-    # TODO: Load close approach data from the given JSON file.
-    return ()
+    # Load close approach data from the given JSON file.
+
+    cad=[]
+
+    with open(cad_json_path, 'r') as file:
+        data = json.load(file)
+        des_index = data['fields'].index('des')
+        cd_index = data['fields'].index('cd')
+        dist_index = data['fields'].index('dist')
+        v_rel_index = data['fields'].index('v_rel')
+        for i in data['data']:
+            cad.append(CloseApproach(time=i[cd_index],
+                                    distance=i[dist_index],
+                                    velocity=i[v_rel_index],
+                                    designation=i[des_index]
+                                    ))
+
+    return cad
